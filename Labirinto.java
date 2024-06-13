@@ -5,6 +5,7 @@ import java.util.*;
 public class Labirinto {
     // Array do labirinto
     private char[][] labirinto;
+    private char[][] labirintoOriginal;
 
     // adionando cores para o caminho percorrido
     private final String ANSI_GREEN = "\u001B[32m";
@@ -21,9 +22,17 @@ public class Labirinto {
             // Lê todas as linhas do arquivo e armazena em uma lista
             List<String> linhas = Files.readAllLines(Paths.get(filename));
             labirinto = new char[linhas.size()][];
+            labirintoOriginal = new char[linhas.size()][];
             for (int i = 0; i < linhas.size(); i++) {
                 // Converte a linha em um array de caracteres e armazena no labirinto
                 labirinto[i] = linhas.get(i).toCharArray();
+                labirintoOriginal[i] = linhas.get(i).toCharArray();
+                // Oculta a letra D
+                for (int j = 0; j < labirinto[i].length; j++) {
+                    if (labirinto[i][j] == 'D') {
+                        labirinto[i][j] = ' ';
+                    }
+                }
             }
         } catch (IOException e) {
             // Imprime a pilha de chamadas para ajudar na depuração se ocorrer um erro
@@ -46,11 +55,12 @@ public class Labirinto {
             return false;
         }
         // Verifica se a posição atual é o destino
-        if (labirinto[x][y] == 'D') {
+        if (labirintoOriginal[x][y] == 'D') {
+            labirinto[x][y] = 'D'; // Revela a letra D
             return true;
         }
         // Verifica se a posição atual é uma parede ou já foi percorrida
-        if (labirinto[x][y] == 'X' || labirinto[x][y] == '$') {
+        if (labirintoOriginal[x][y] == 'X' || labirinto[x][y] == '$') {
             return false;
         }
         // Marca a posição atual como percorrida
@@ -80,8 +90,8 @@ public class Labirinto {
     private void imprimeLabirinto() {
         for (char[] linha : labirinto) {
             for (char c : linha) {
-                // Imprime o $ em verde para indicar o caminho percorrido
-                if (c == '$') {
+                // Imprime o $ e o D em verde para indicar o caminho percorrido e o destino
+                if (c == '$' || c == 'D') {
                     System.out.print(ANSI_GREEN + c + ANSI_RESET);
                 } else {
                     System.out.print(c);
